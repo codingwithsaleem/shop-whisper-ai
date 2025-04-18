@@ -1,7 +1,11 @@
-
 import { OpenAI } from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
 import type { Product } from '../components/ChatWidget';
+
+// Polyfill for Node.js global in browser environment
+if (typeof global === 'undefined') {
+  (window as any).global = window;
+}
 
 // Placeholder for actual API keys - these should come from environment variables
 // or be entered by the user in a secure way
@@ -41,10 +45,15 @@ const initializePinecone = () => {
     }
   }
   
-  return new Pinecone({
-    apiKey: PINECONE_API_KEY,
-    environment: PINECONE_ENVIRONMENT
-  });
+  try {
+    return new Pinecone({
+      apiKey: PINECONE_API_KEY,
+      environment: PINECONE_ENVIRONMENT
+    });
+  } catch (error) {
+    console.error('Error initializing Pinecone:', error);
+    throw error;
+  }
 };
 
 // Generate embedding for a query using OpenAI
